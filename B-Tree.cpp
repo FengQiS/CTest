@@ -67,35 +67,121 @@ void InsertBTree(BTreeNode root, int k)
                }
                else
                {
-                    int m = p->key[m-1];
-                    BTreeNode f = p->parent;
-                    int t = 0;
-                    while (t < f->num && f->key[t] < m) t++;
-                    for (int x = f->num; x--; x>t) 
+                    int o = p->key[m-1];
+                    //when the p is root
+                    if (p->parent == null)
                     {
-                         f->key[x] = f->key[x-1];
-                         f->child[x] = f->child[x-1];
+                         p->parent = new BTreeNode();
+                         BTreeNode f = p->parent;
+                         f->key[0] = o;
+                         f->num++;
+                         BTreeNode l = new BtreeNode();
+                         BTreeNode r = new BtreeNode();
+                         l->key[0] = p->key[0]; l->key[1] = p->key[1];
+                         r->key[0] = p->key[3]; r->key[1] = p->key[4];
+                         f->c[0] = l;
+                         f->c[1] = r;
+                         l->parent = f;
+                         r->parent = f;
+                         if (k < p->key[m-1])
+                             l->key[m-1] = k; l->num++;
+                         else
+                             r->key[m-1] = k; r->num++;
+                         delete p;                         
                     }
-                    f->key[t] = m;
-                    f->num++;
-                    BTreeNode l = new BtreeNode();
-                    BTreeNode r = new BtreeNode();
-                    l->key[0] = p->key[0]; l->key[1] = p->key[1];
-                    r->key[0] = p->key[3]; r->key[1] = p->key[4];
-                    f->c[t] = l;
-                    f->c[t+1] = r;
-                    l->parent = f;
-                    r->parent = f;
-                    if (k < p->key[m-1])
-                         l->key[m-1] = k; l->num++;
                     else
-                         r->key[m-1] = k; r->num++;
-                    delete p;
+                    {
+                        BTreeNode f = p->parent;
+                        int t = 0;
+                        while (t < f->num && f->key[t] < o) t++;
+                        for (int x = f->num; x--; x>t) 
+                        {
+                             f->key[x] = f->key[x-1];
+                             f->child[x] = f->child[x-1];
+                        }
+                        f->key[t] = o;
+                        f->num++;
+                        BTreeNode l = new BtreeNode();
+                        BTreeNode r = new BtreeNode();
+                        l->key[0] = p->key[0]; l->key[1] = p->key[1];
+                        r->key[0] = p->key[3]; r->key[1] = p->key[4];
+                        f->c[t] = l;
+                        f->c[t+1] = r;
+                        l->parent = f;
+                        r->parent = f;
+                        if (k < p->key[m-1])
+                        {
+                             l->key[m-1] = k;
+                             l->num++;
+                        }
+                        else
+                        {
+                             l->key[m-1] = k;
+                             l->num++;                          
+                        }
+                        delete p;
                }
+          }
+          else if(p->num < 2*m-1)
+          {
+               p = p->child[i];
           }
           else
           {
-               p = p->child[i];
+                   int m = p->key[m-1];
+                    if (p->parent == null)//when the p is root
+                    {
+                         p->parent = new BTreeNode();
+                         BTreeNode f = p->parent;
+                         f->key[0] = o;
+                         f->num++;
+                         BTreeNode l = new BtreeNode();
+                         BTreeNode r = new BtreeNode();
+                         l->key[0] = p->key[0]; l->key[1] = p->key[1];
+                         r->key[0] = p->key[3]; r->key[1] = p->key[4];
+                         l->key[0] = p->key[0]; l->key[1] = p->key[1];
+                         l->child[0] = p->child[0]; l->child[1] = p->child[1]; l->child[2] = p->child[2];
+                         r->key[0] = p->key[3]; r->key[1] = p->key[4];
+                         r->child[0] = p->child[3]; r->child[1] = p->child[4]; r->child[2] = p->child[5];
+                         f->c[0] = l;
+                         f->c[1] = r;
+                         l->parent = f;
+                         r->parent = f;
+                         delete p;
+                         if (i < m)
+                             p = l->child[i];
+                         else
+                             p = l->child[i-m];  
+                         }                  
+                    }
+                    else
+                    {
+                         BTreeNode f = p->parent;
+                         int t = 0;
+                         while (t < f->num && f->key[t] < m) t++;
+                         for (int x = f->num; x--; x>t) 
+                         {
+                             f->key[x] = f->key[x-1];
+                             f->child[x] = f->child[x-1];
+                         }
+                         f->key[t] = m;
+                         f->num++;
+                         BTreeNode l = new BtreeNode();
+                         BTreeNode r = new BtreeNode();
+                         l->key[0] = p->key[0]; l->key[1] = p->key[1];
+                         l->child[0] = p->child[0]; l->child[1] = p->child[1]; l->child[2] = p->child[2];
+                         r->key[0] = p->key[3]; r->key[1] = p->key[4];
+                         r->child[0] = p->child[3]; r->child[1] = p->child[4]; r->child[2] = p->child[5];
+                         f->c[t] = l;
+                         f->c[t+1] = r;
+                         l->parent = f;
+                         r->parent = f;
+                         delete p;
+                         if (i < m)
+                             p = l->child[i];
+                         else
+                             p = l->child[i-m];  
+                    }
           }
      }
 }
@@ -108,6 +194,6 @@ void DeleteBTree(int key)
 int main()
 {
      //the test data: 10 9 8 11 13 6 7 4 3 18 20 1 5 19 25 22 23 24
-     BTreeNode root;
+     BTreeNode root = null;
      return 0;
 }
